@@ -42,3 +42,13 @@ def builds(job_id):
             mimetype='application/json'
         )
         return response
+
+@api_blueprint.route('/nodes')
+def nodes():
+    response = Response(
+        response=json.dumps(controller.get_nodes(), default=lambda x: x.__dict__),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
+

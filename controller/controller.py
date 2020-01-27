@@ -7,11 +7,18 @@ jobs = [
     job.Job("Test Job 3", "this is a third test job")
 ]
 
+nodes = [
+    Node('localhost','/home/hector')
+]
+
 def get_jobs():
     return jobs
 
+def get_nodes():
+    return nodes
+
 def create_job(title, description):
-    new_job = job.Job(3, title, description)
+    new_job = job.Job(title, description)
     jobs.append(new_job)
     return new_job
 
@@ -19,11 +26,7 @@ def get_builds(job_id):
     return jobs[job_id].builds
 
 def create_build(job_id, commands):
-    print(commands)
-    runner = Node("/home/hector")
-    build = jobs[job_id].create_build(description=f"This is a test build for job {job_id}", commands=commands)
-
-    # RUN BUILD AND COLLECT OUTPUT
-    build.output = runner.run_commands(build.commands) #hardcoded for now
-
+    build = jobs[job_id].create_build(description=f"This is a test build for job {job_id}",
+                                      commands=commands, node=nodes[0])
+    build.run_build()
     return build

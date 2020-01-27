@@ -12,6 +12,7 @@ class Job:
         Job._id += 1
 
     def create_build(self, **kwargs):
-        build = Build(id=len(self.builds), description=kwargs['description'], commands=kwargs['commands'])
+        build = Build(id=len(self.builds), description=kwargs['description'],
+                      commands=kwargs['commands'], node=kwargs['node'])
         self.builds.append(build)
         return build
