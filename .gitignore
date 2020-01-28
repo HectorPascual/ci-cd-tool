@@ -1,2 +1,4 @@
 .idea
 Pipfile.lock
+app.db
+__pycache__/

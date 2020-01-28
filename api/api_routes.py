@@ -1,5 +1,4 @@
 import json
-
 from controller import controller
 from flask import Blueprint, Response, request
 
