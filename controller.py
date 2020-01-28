@@ -25,7 +25,7 @@ def get_nodes():
 
 def get_builds(job_id):
     try :
-        builds = Build.query.all()
+        builds = Build.query.filter_by(job_id=job_id)
         builds_json=json.dumps([build.to_dict() for build in builds])
         return builds_json
     except Exception as e:
@@ -37,16 +37,20 @@ def create_job(title, description):
      db.session.add(Job(title=title,description=description))
      db.session.commit()
 
-def create_build(job_id, commands, description):
+def create_build(job_id, commands, node_id, description):
+    output = run_on_node(commands, node_id)
+    db.session.add(Build(job_id=job_id, commands=commands, output = output, node_id = node_id,
+                         description = description))
+    db.session.commit()
+
+def create_node(workspace, ip_addr, proto):
+    db.session.add(Node(workspace=workspace, ip_addr=ip_addr, proto=proto))
+    db.session.commit()
+
+def run_on_node(commands, node_id):
+    node = Node.query.get(node_id)
     output = ""
     cmd_list = commands.split(';')
     for cmd in cmd_list:
-        output += subprocess.check_output(cmd, shell=True).decode('utf-8')
-    db.session.add(Build(job_id=job_id, commands=commands, output = output, description = description))
-    db.session.commit()
-
-# def create_build(job_id, commands):
-#     build = jobs[job_id].create_build(description=f"This is a test build for job {job_id}",
-#                                       commands=commands, node=nodes[0])
-#     build.run_build()
-#     return build
+        output += subprocess.check_output(f"cd {node.workspace};{cmd}", shell=True).decode('utf-8')
+        return output

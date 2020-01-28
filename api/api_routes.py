@@ -36,23 +36,34 @@ def builds(job_id):
         return response
     elif request.method == 'POST':
         commands = request.form['commands']
-        title = request.form['title']
+        node = request.form['node']
         description = request.form['description']
         response = Response(
-            response=controller.create_build(int(job_id), commands   , description),
+            response=controller.create_build(int(job_id), commands, node, description),
             status=200,
             mimetype='application/json'
         )
         return response
 
-@api_blueprint.route('/nodes')
+@api_blueprint.route('/nodes', methods=('GET', 'POST'))
 def nodes():
     import controller
 
-    response = Response(
-        response=controller.get_nodes(),
-        status=200,
-        mimetype='application/json'
-    )
-    return response
+    if request.method == 'GET':
+        response = Response(
+            response=controller.get_nodes(),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+    elif request.method == 'POST':
+        workspace = request.form['workspace']
+        ip_addr = request.form['ip_addr']
+        proto = request.form['proto']
+        response = Response(
+            response=controller.create_node(workspace, ip_addr, proto),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
 

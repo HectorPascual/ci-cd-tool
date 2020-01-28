@@ -7,8 +7,7 @@ class Build(db.Model):
     commands = db.Column(db.Text)
     output= db.Column(db.Text)
     job_id = db.Column(db.Integer, db.ForeignKey("job.id"))
-
-    #node = db.relationship('Node', uselist = False, lazy = True)
+    node_id = db.Column(db.Integer, db.ForeignKey("node.id"))
 
     def to_dict(self):
         return {
@@ -16,7 +15,8 @@ class Build(db.Model):
             'description': self.description,
             'commands': self.commands,
             'output': self.output,
-            'job_id': self.job_id
+            'job_id': self.job_id,
+            'node_id': self.node_id
         }
     def __repr__(self):
         return f"<id {self.id}, description : {self.description}>"
@@ -33,7 +33,6 @@ class Job(db.Model):
             'id' : self.id,
             'title' : self.title,
             'description': self.description
-            #'builds': self.builds if len(self.builds) else []
         }
 
     def __repr__(self):
@@ -44,7 +43,8 @@ class Node(db.Model):
     workspace = db.Column(db.Text)
     ip_addr = db.Column(db.Text)
     proto= db.Column(db.Text)
-    #build_id = db.Column(db.Integer, db.ForeignKey("build.id"))
+
+    builds = db.relationship('Build', backref='node', lazy = False)
 
     def to_dict(self):
         return {
