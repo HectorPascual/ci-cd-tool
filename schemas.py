@@ -2,7 +2,8 @@ from app import db
 
 class Build(db.Model):
 
-    id = db.Column(db.Integer, primary_key=True)
+    _id = db.Column(db.Integer, primary_key=True) # ID in database (is unique)
+    id = db.Column(db.Integer) # ID in job, together with job_id is an unique tuple
     description = db.Column(db.Text)
     commands = db.Column(db.Text)
     output= db.Column(db.Text)
