@@ -5,7 +5,7 @@ from app import db
 import json
 import subprocess
 
-
+# READ METHODS
 def get_jobs(job_id=None):
     try :
         if job_id :
@@ -49,7 +49,7 @@ def get_builds(job_id, build_id=None):
         print(e)
         return json.dumps([])
 
-
+# CREATE METHODS
 def create_job(title, description):
      db.session.add(Job(title=title,description=description))
      db.session.commit()
@@ -67,10 +67,19 @@ def create_node(workspace, ip_addr, proto):
     db.session.add(Node(workspace=workspace, ip_addr=ip_addr, proto=proto))
     db.session.commit()
 
+# DELETE METHODS
 def delete_job(job_id):
     try:
         job = Job.query.get(job_id)
         db.session.delete(job)
+    except Exception as e:
+        return json.dumps([])
+
+def delete_build(job_id, build_id):
+    try:
+        build = Build.query.filter_by(job_id=job_id, id=build_id).first()
+        db.session.delete(build)
+        db.session.commit()
     except Exception as e:
         return json.dumps([])
 
@@ -82,7 +91,7 @@ def delete_node(node_id):
         return json.dumps([])
 
 
-
+# Other methods
 def run_on_node(commands, node_id):
     node = Node.query.get(node_id)
     output = ""

@@ -76,7 +76,7 @@ def build(job_id, build_id):
         return response
     elif request.method == 'DELETE':
         response = Response(
-            response=controller.delete_build(build_id),
+            response=controller.delete_build(job_id, build_id),
             status=200,
             mimetype='application/json'
         )
