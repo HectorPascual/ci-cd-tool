@@ -43,7 +43,9 @@ class Node(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     workspace = db.Column(db.Text)
     ip_addr = db.Column(db.Text)
-    proto= db.Column(db.Text)
+    port = db.Column(db.Integer)
+    user = db.Column(db.String(64))
+    password = db.Column(db.String(64))
 
     builds = db.relationship('Build', backref='node', lazy = False)
 
@@ -52,7 +54,7 @@ class Node(db.Model):
             'id' : self.id,
             'workspace' : self.workspace,
             'ip_addr': self.ip_addr,
-            'proto' : self.proto
+            'user' : self.user
         }
     def __repr__(self):
         return f"<id {self.id}, @IP : {self.description}>"

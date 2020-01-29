@@ -9,6 +9,7 @@ verify_ssl = true
 flask = "*"
 flask-migrate = "*"
 flask-sqlalchemy = "==2.1.0"
+paramiko = "*"
 
 [requires]
 python_version = "3.7"

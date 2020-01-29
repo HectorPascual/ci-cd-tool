@@ -77,8 +77,8 @@ def create_build(job_id, commands, node_id, description):
                          node_id = node_id, description = description))
     db.session.commit()
 
-def create_node(workspace, ip_addr, proto):
-    node = Node(workspace=workspace, ip_addr=ip_addr, proto=proto)
+def create_node(workspace, ip_addr, port, user=None, password=None):
+    node = Node(workspace=workspace, ip_addr=ip_addr, port=port, user=user, password=password)
     db.session.add(node)
     db.session.commit()
 

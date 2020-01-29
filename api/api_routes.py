@@ -96,9 +96,11 @@ def nodes():
     elif request.method == 'POST':
         workspace = request.form['workspace']
         ip_addr = request.form['ip_addr']
-        proto = request.form['proto']
+        port = request.form['port']
+        user = request.form['user']
+        password = request.form['password']
         response = Response(
-            response=controller.create_node(workspace, ip_addr, proto),
+            response=controller.create_node(workspace, ip_addr, port, user, password),
             status=200,
             mimetype='application/json'
         )
