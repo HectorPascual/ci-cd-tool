@@ -2,8 +2,11 @@ from schemas import Job
 from schemas import Node
 from schemas import Build
 from app import db
+from runner import *
 import json
-import subprocess
+
+# Nodes with connection established
+runners = {}
 
 # READ METHODS
 def get_jobs(job_id=None):
@@ -56,16 +59,29 @@ def create_job(title, description):
 
 def create_build(job_id, commands, node_id, description):
     job = Job.query.get(job_id)
+    node = Node.query.get(node_id)
+
     id = len(job.builds) + 1
 
-    output = run_on_node(commands, node_id)
+    if not node_id in runners:
+        if node.ip_addr == 'localhost':
+            runners[node.id] = RunerLOCALHOST(node)  # Add to runners dict a new instance
+        else:
+            runner = RunnerSSH(node)
+            runner.connect()
+            runners[node.id] = runner
+
+    output = runners[int(node_id)].run_commands(commands)
+
     db.session.add(Build(id = id, job_id=job_id, commands=commands, output = output,
                          node_id = node_id, description = description))
     db.session.commit()
 
 def create_node(workspace, ip_addr, proto):
-    db.session.add(Node(workspace=workspace, ip_addr=ip_addr, proto=proto))
+    node = Node(workspace=workspace, ip_addr=ip_addr, proto=proto)
+    db.session.add(node)
     db.session.commit()
+
 
 # DELETE METHODS
 def delete_job(job_id):
@@ -89,13 +105,3 @@ def delete_node(node_id):
         db.session.delete(node)
     except Exception as e:
         return json.dumps([])
-
-
-# Other methods
-def run_on_node(commands, node_id):
-    node = Node.query.get(node_id)
-    output = ""
-    cmd_list = commands.split(';')
-    for cmd in cmd_list:
-        output += subprocess.check_output(f"cd {node.workspace};{cmd}", shell=True).decode('utf-8')
-        return output
