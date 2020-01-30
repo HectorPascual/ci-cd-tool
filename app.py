@@ -2,7 +2,7 @@ from flask import Flask
 import logging
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
-from api.api_routes import api_blueprint
+from api import api_blueprint
 from flask_sqlalchemy import SQLAlchemy
 
 logging.basicConfig(level=logging.INFO)

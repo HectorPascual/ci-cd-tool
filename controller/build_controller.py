@@ -1,51 +1,13 @@
-from schemas import Job
-from schemas import Node
-from schemas import Build
-from app import db
-from runner import *
 import json
 import logging
+from schemas import *
+from app import db
+from runner import *
 
 logger = logging.getLogger('root')
 
 # Nodes with connection established
 runners = {}
-
-# READ METHODS
-def get_jobs(job_id=None):
-    try :
-        if job_id :
-            logger.info(f"[DB Access] Getting job : {job_id}")
-            job = Job.query.get(job_id)
-            job_json = json.dumps(job.to_dict())
-            return job_json
-        else:
-            logger.info(f"[DB Access] Getting all jobs")
-            jobs = Job.query.all()
-            jobs_json = json.dumps([job.to_dict() for job in jobs])
-            return jobs_json
-    except Exception as e:
-        logger.warning(f"[DB Access] There was a problem trying to get jobs\n{e}")
-        return json.dumps([])
-
-
-def get_nodes(node_id=None):
-    try :
-        if node_id:
-            logger.info(f"[DB Access] Getting node : {node_id}")
-            node = Node.query.get(node_id)
-            node_json = json.dumps(node.to_dict())
-            return node_json
-        else:
-            logger.info(f"[DB Access] Getting all nodes")
-            nodes = Node.query.all()
-            nodes_json=json.dumps([node.to_dict() for node in nodes])
-            return nodes_json
-    except Exception as e:
-        logger.info(f"[DB Access] There was a problem trying to get nodes\n{e}")
-        print(e)
-        return json.dumps([])
-
 
 def get_builds(job_id, build_id=None):
     try :
@@ -62,13 +24,6 @@ def get_builds(job_id, build_id=None):
     except Exception as e:
         logger.info(f"[DB Access] There was a problem trying to get builds\n{e}")
         return json.dumps([])
-
-# CREATE METHODS
-def create_job(title, description):
-    job = Job(title=title,description=description)
-    logger.info(f"[DB Access] Creating job : {job}")
-    db.session.add(job)
-    db.session.commit()
 
 def create_build(job_id, commands, node_id, description):
     job = Job.query.get(job_id)
@@ -97,35 +52,11 @@ def create_build(job_id, commands, node_id, description):
                          node_id = node_id, description = description, status=status))
     db.session.commit()
 
-def create_node(workspace, ip_addr, port, user=None, password=None):
-    node = Node(workspace=workspace, ip_addr=ip_addr, port=port, user=user, password=password)
-    logger.info(f"[DB Access] Creating node : {node}")
-    db.session.add(node)
-    db.session.commit()
-
-
-# DELETE METHODS
-def delete_job(job_id):
-    try:
-        job = Job.query.get(job_id)
-        logger.info(f"[DB Access] Deleting job : {job}")
-        db.session.delete(job)
-    except Exception as e:
-        return json.dumps([])
-
 def delete_build(job_id, build_id):
     try:
         build = Build.query.filter_by(job_id=job_id, id=build_id).first()
         logger.info(f"[DB Access] Deleting build nº {build_id} from job {job_id}")
         db.session.delete(build)
         db.session.commit()
-    except Exception as e:
-        return json.dumps([])
-
-def delete_node(node_id):
-    try :
-        node = Node.query.get(node_id)
-        logger.info(f"[DB Access] Deleting node {node_id}")
-        db.session.delete(node)
     except Exception as e:
         return json.dumps([])
