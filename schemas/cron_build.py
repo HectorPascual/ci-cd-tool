@@ -2,7 +2,8 @@ import datetime
 from app import db
 
 class CronBuild(db.Model):
-    cron_key = db.Column(db.String('32'), primary_key=True)
+    cron_key = db.Column(db.String(32), primary_key=True)
+    cron_exp = db.Column(db.String(32))
     build_description = db.Column(db.Text)
     commands = db.Column(db.Text)
     job_id = db.Column(db.Integer, db.ForeignKey("job.id"))

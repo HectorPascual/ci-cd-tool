@@ -61,11 +61,10 @@ def builds(job_id):
         node = request.form['node']
         description = request.form['description']
         cron_exp = request.form.get('cron_exp')
+        cron_key = request.form.get('cron_key')
 
         if cron_exp:
-            import cron
-            logger.info(f"Cron expression detected {cron_exp} for a new build")
-            cron.cron_build(cron_exp, job_id, commands, node, description)
+            controller.create_cron(cron_exp, cron_key, job_id, commands, node, description)
 
         response = Response(
             response=controller.create_build(job_id, commands, node, description),
@@ -129,6 +128,17 @@ def node(node_id):
     elif request.method == 'DELETE':
         response = Response(
             response=controller.delete_node(node_id),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
+@api_blueprint.route('/cron_builds')
+def cron_builds():
+    import controller
+    if request.method == 'GET':
+        response = Response(
+            response=controller.get_cron_builds(),
             status=200,
             mimetype='application/json'
         )
