@@ -20,13 +20,15 @@ class RunnerSSH():
     def run_commands(self, commands):
         output = ""
         cmd_list = commands.split(';')
+        status = "passed"
         for cmd in cmd_list:
             logging.info(f"Executing shell command : {cmd}")
             _ , stdout , stderr = self.ssh_client.exec_command(f"cd {self.node.workspace};{cmd}")
             output += stdout.read().decode("utf-8")
             if stderr.read().decode("utf-8") != '' :
+                status = "failed"
                 logging.error(stderr.read()).decode("utf-8")
-        return output
+        return output, status
 
 
 class RunerLOCALHOST():
@@ -36,7 +38,13 @@ class RunerLOCALHOST():
     def run_commands(self, commands):
         output = ""
         cmd_list = commands.split(';')
+        status = "passed"
         for cmd in cmd_list:
             logging.info(f"Executing shell command : {cmd}")
-            output += subprocess.check_output(f"cd {self.node.workspace};{cmd}", shell=True).decode('utf-8')
-            return output
+            try :
+                output += subprocess.check_output(f"cd {self.node.workspace};{cmd}",
+                                              stderr=subprocess.STDOUT, shell=True).decode('utf-8')
+            except subprocess.CalledProcessError as e:
+                logging.error(e)
+                status = "failed"
+        return output, status

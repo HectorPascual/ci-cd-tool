@@ -90,11 +90,12 @@ def create_build(job_id, commands, node_id, description):
             runners[node.id] = runner
     else:
         logging.info(f"The node {node_id} is already a runner (has a connection established)")
-    output = runners[int(node_id)].run_commands(commands)
+
+    output, status = runners[int(node_id)].run_commands(commands)
 
     logger.info(f"[DB Access] Creating build nº : {id} on job {job_id}")
     db.session.add(Build(id = id, job_id=job_id, commands=commands, output = output,
-                         node_id = node_id, description = description))
+                         node_id = node_id, description = description, status=status))
     db.session.commit()
 
 def create_node(workspace, ip_addr, port, user=None, password=None):
