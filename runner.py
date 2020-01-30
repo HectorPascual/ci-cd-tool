@@ -1,5 +1,8 @@
 import subprocess
 import paramiko
+import logging
+
+logger = logging.getLogger('root')
 
 class RunnerSSH():
     def __init__(self, node):
@@ -7,15 +10,22 @@ class RunnerSSH():
         self.ssh_client = paramiko.SSHClient()
 
     def connect(self):
-        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
-        self.ssh_client.connect(self.node.ip_addr, self.node.port, self.node.user, self.node.password)
+        try:
+            self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+            self.ssh_client.connect(self.node.ip_addr, self.node.port, self.node.user, self.node.password)
+            logging.info("[SSH] Connection established successfully")
+        except Exception as e:
+            logging.warning(f'[SSH] There was an error while establishing connection {e}')
 
     def run_commands(self, commands):
         output = ""
         cmd_list = commands.split(';')
         for cmd in cmd_list:
-            _ , stdout , _ = self.ssh_client.exec_command(f"cd {self.node.workspace};{cmd}")
-            output += str(stdout.read())
+            logging.info(f"Executing shell command : {cmd}")
+            _ , stdout , stderr = self.ssh_client.exec_command(f"cd {self.node.workspace};{cmd}")
+            output += stdout.read().decode("utf-8")
+            if stderr.read().decode("utf-8") != '' :
+                logging.error(stderr.read()).decode("utf-8")
         return output
 
 
@@ -27,5 +37,6 @@ class RunerLOCALHOST():
         output = ""
         cmd_list = commands.split(';')
         for cmd in cmd_list:
+            logging.info(f"Executing shell command : {cmd}")
             output += subprocess.check_output(f"cd {self.node.workspace};{cmd}", shell=True).decode('utf-8')
             return output
