@@ -75,7 +75,6 @@ def create_build(job_id, commands, node_id, description):
     node = Node.query.get(node_id)
 
     id = len(job.builds) + 1
-
     logger.info(f"New build from job {job_id} will run on node : {node_id}")
 
     if not node.id in runners:

@@ -1,4 +1,7 @@
 from flask import Blueprint, Response, request
+import logging
+
+logger = logging.getLogger('root')
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -57,6 +60,13 @@ def builds(job_id):
         commands = request.form['commands']
         node = request.form['node']
         description = request.form['description']
+        cron_exp = request.form.get('cron_exp')
+
+        if cron_exp:
+            import cron
+            logger.info(f"Cron expression detected {cron_exp} for a new build")
+            cron.cron_build(cron_exp, job_id, commands, node, description)
+
         response = Response(
             response=controller.create_build(job_id, commands, node, description),
             status=200,
