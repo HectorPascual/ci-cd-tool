@@ -78,8 +78,8 @@ def create_build(job_id, commands, node_id, description):
 
     logger.info(f"New build from job {job_id} will run on node : {node_id}")
 
-    if not node_id in runners:
-        logging.info(f"The node {node_id} is not a runner (no connection stablished)")
+    if not node.id in runners:
+        logging.info(f"The node {node_id} is not a runner (no connection established)")
         if node.ip_addr == 'localhost':
             logging.info(f"Creating a localhost runner for node {node_id}")
             runners[node.id] = RunerLOCALHOST(node)  # Add to runners dict a new instance
@@ -88,7 +88,8 @@ def create_build(job_id, commands, node_id, description):
             runner = RunnerSSH(node)
             runner.connect()
             runners[node.id] = runner
-
+    else:
+        logging.info(f"The node {node_id} is already a runner (has a connection established)")
     output = runners[int(node_id)].run_commands(commands)
 
     logger.info(f"[DB Access] Creating build nº : {id} on job {job_id}")
