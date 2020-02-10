@@ -143,3 +143,21 @@ def cron_builds():
             mimetype='application/json'
         )
         return response
+
+@api_blueprint.route('/cron_build/<cron_key>', methods=('GET', 'DELETE'))
+def cron_build(cron_key):
+    import controller
+    if request.method == 'GET':
+        response = Response(
+            response=controller.get_cron_builds(cron_key),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+    else :
+        response = Response(
+            response=controller.delete_cron(cron_key),
+            status=200,
+            mimetype='application/json'
+        )
+        return response

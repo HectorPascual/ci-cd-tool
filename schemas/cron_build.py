@@ -18,7 +18,6 @@ class CronBuild(db.Model):
             'job_id': self.job_id,
             'node_id': self.node_id,
             'created_date': self.created_date.strftime("%m/%d/%Y, %H:%M:%S")
-
         }
 
     def __repr__(self):
