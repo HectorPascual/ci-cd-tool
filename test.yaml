@@ -1,0 +1,14 @@
+- stage:
+    name: Checkout
+    commands :
+        - pwd
+        - echo 'hello'
+
+
+- stage:
+    name: Build
+    commands:
+        - pwd
+        - ls
+        - time
+        - echo bye

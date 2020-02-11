@@ -3,7 +3,7 @@ import logging
 from schemas import *
 from app import db
 from runner import *
-
+import yaml
 logger = logging.getLogger('root')
 
 # Nodes with connection established
@@ -60,3 +60,9 @@ def delete_build(job_id, build_id):
         db.session.commit()
     except Exception as e:
         return json.dumps([])
+
+def parse_yaml(cmd_file):
+    content = yaml.load(cmd_file, Loader=yaml.FullLoader)
+    commands = ';'.join([cmd for item in content for cmd in item['stage']['commands']])
+    logger.info(f"Parsing command file for new build, commands obtained : {commands}")
+    return commands

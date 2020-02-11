@@ -11,6 +11,7 @@ flask-migrate = "*"
 flask-sqlalchemy = "==2.1.0"
 paramiko = "*"
 apscheduler = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"

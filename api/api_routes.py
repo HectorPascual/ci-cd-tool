@@ -57,15 +57,18 @@ def builds(job_id):
         )
         return response
     elif request.method == 'POST':
-        commands = request.form['commands']
         node = request.form['node']
         description = request.form['description']
+        commands = request.form.get('commands')
         cron_exp = request.form.get('cron_exp')
         cron_key = request.form.get('cron_key')
 
+        # YAML File handling
+        if request.files:
+            commands_file = request.files['commands_file']
+            commands = controller.parse_yaml(commands_file)
         if cron_exp:
             controller.create_cron(cron_exp, cron_key, job_id, commands, node, description)
-
         response = Response(
             response=controller.create_build(job_id, commands, node, description),
             status=200,
