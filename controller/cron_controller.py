@@ -1,10 +1,11 @@
 from .build_controller import create_build
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.memory import JobLookupError
 import logging
 from app import db
 from schemas import CronBuild
 import json
-
+from sqlalchemy.exc import InvalidRequestError
 scheduler = BackgroundScheduler() # Scheduler for cron builds
 logger = logging.getLogger('root')
 
@@ -55,6 +56,11 @@ def delete_cron(cron_key):
         logger.info(f"[DB Access] Deleting cron build : {cron}")
         db.session.delete(cron)
         db.session.commit()
-    except Exception as e:
-        logger.warning(f"[DB Access] There was a problem trying to get delete builds\n{e}")
+    except InvalidRequestError as e:
+        logger.warning(f"[DB Access] There was a problem trying to get delete cron build : {e}")
         return json.dumps([])
+    except JobLookupError as e:
+        logger.warning(e)
+        logger.info(f"[DB Access] Deleting cron build : {cron}")
+        db.session.delete(cron)
+        db.session.commit()
