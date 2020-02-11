@@ -32,5 +32,6 @@ def delete_job(job_id):
         job = Job.query.get(job_id)
         logger.info(f"[DB Access] Deleting job : {job}")
         db.session.delete(job)
+        db.session.commit()
     except Exception as e:
         return json.dumps([])

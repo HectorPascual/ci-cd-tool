@@ -54,6 +54,7 @@ def delete_cron(cron_key):
         scheduler.remove_job(cron_key)
         logger.info(f"[DB Access] Deleting cron build : {cron}")
         db.session.delete(cron)
+        db.session.commit()
     except Exception as e:
         logger.warning(f"[DB Access] There was a problem trying to get delete builds\n{e}")
         return json.dumps([])
