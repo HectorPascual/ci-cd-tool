@@ -13,5 +13,11 @@ app.register_blueprint(api_blueprint)
 db = SQLAlchemy(app)
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    # Must start the cron jobs stored in the database
+    from controller import start_cron
+    from schemas import CronBuild
+    cron_list = CronBuild.query.all()
+    start_cron(cron_list)
 
+    # Start the Flask App
+    app.run(debug=False)

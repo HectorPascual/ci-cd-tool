@@ -6,6 +6,7 @@ from app import db
 from schemas import CronBuild
 import json
 from sqlalchemy.exc import InvalidRequestError
+
 scheduler = BackgroundScheduler() # Scheduler for cron builds
 logger = logging.getLogger('root')
 
@@ -64,3 +65,18 @@ def delete_cron(cron_key):
         logger.info(f"[DB Access] Deleting cron build : {cron}")
         db.session.delete(cron)
         db.session.commit()
+
+
+def start_cron(cron_list):
+    for cron in cron_list:
+        minute, hour, day_month, month, day_week = cron.cron_exp.split(' ')
+        kwargs = {
+            'job_id': cron.job_id,
+            'commands': cron.commands,
+            'node_id': cron.node_id,
+            'description': cron.build_description
+        }
+        scheduler.add_job(func=create_build, kwargs=kwargs, trigger="cron", minute=minute, hour=hour,
+                          day=day_month, month=month, day_of_week=day_week, id=cron.cron_key)
+        scheduler.start()
+        logger.info(f"Started cron stored in db, in job {cron.job_id} and node {cron.node_id}")
