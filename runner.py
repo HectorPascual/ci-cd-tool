@@ -1,13 +1,14 @@
 import subprocess
 import paramiko
 import logging
-
+from pathlib import Path
 logger = logging.getLogger('root')
 
 class RunnerSSH():
     def __init__(self, node):
         self.node = node
         self.ssh_client = paramiko.SSHClient()
+        self.ftp_client = None
 
     def connect(self):
         try:
@@ -29,6 +30,25 @@ class RunnerSSH():
                 status = "failed"
         return output, status
 
+    def get_files(self, artifacts, local_path, workspace):
+        # Create local path if doesn't exist
+        Path(local_path).mkdir(parents=True, exist_ok=True)
+
+        # Init sftp session if not existing yet
+        if not self.ftp_client:
+            self.ftp_client = self.ssh_client.open_sftp()
+
+        # If wildcard, multiple files will be searched else only the file that matches the path for
+        # each artifact
+        for artifact in artifacts:
+            files = [artifact]
+            if '*' in artifact:
+                p = Path(artifact)
+                _, stdout, _ = self.ssh_client.exec_command(f"find {workspace}/{p.parents[0]} -name '{p.name}'")
+                files = stdout.read().decode("utf-8").splitlines()
+            for file in files:
+                f = Path(file)
+                self.ftp_client.get(file, local_path + f.name)
 
 class RunerLOCALHOST():
     def __init__(self, node):

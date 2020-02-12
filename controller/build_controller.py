@@ -1,3 +1,4 @@
+from os.path import abspath, dirname
 import json
 import logging
 from schemas import *
@@ -25,7 +26,7 @@ def get_builds(job_id, build_id=None):
         logger.info(f"[DB Access] There was a problem trying to get builds\n{e}")
         return json.dumps([])
 
-def create_build(job_id, commands, node_id, description):
+def create_build(job_id, commands, node_id, description, artifacts):
     job = Job.query.get(job_id)
     node = Node.query.get(node_id)
 
@@ -45,9 +46,15 @@ def create_build(job_id, commands, node_id, description):
     else:
         logging.info(f"The node {node_id} is already a runner (has a connection established)")
 
+    logger.info(f"[DB Access] Creating build nº : {id} on job {job_id}")
     output, status = runners[int(node_id)].run_commands(commands)
 
-    logger.info(f"[DB Access] Creating build nº : {id} on job {job_id}")
+    # Manage archive required artifacts
+    if artifacts :
+        runners[int(node_id)].get_files(artifacts,
+                                        f"{dirname(dirname(abspath(__file__)))}/job_{job_id}/build_{id}/",
+                                        node.workspace)
+
     db.session.add(Build(id = id, job_id=job_id, commands=commands, output = output,
                          node_id = node_id, description = description, status=status))
     db.session.commit()
@@ -63,6 +70,7 @@ def delete_build(job_id, build_id):
 
 def parse_yaml(cmd_file):
     content = yaml.load(cmd_file, Loader=yaml.FullLoader)
-    commands = ';'.join([cmd for item in content for cmd in item['stage']['commands']])
+    commands = ';'.join([cmd for item in content for cmd in item.get('stage',{}).get('commands',[])])
+    artifacts = [item.get('archive') for item in content if item.get('archive')]
     logger.info(f"Parsing command file for new build, commands obtained : {commands}")
-    return commands
+    return commands, artifacts

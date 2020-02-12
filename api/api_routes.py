@@ -66,11 +66,12 @@ def builds(job_id):
         # YAML File handling
         if request.files:
             commands_file = request.files['commands_file']
-            commands = controller.parse_yaml(commands_file)
+            commands, artifacts = controller.parse_yaml(commands_file)
+
         if cron_exp:
-            controller.create_cron(cron_exp, cron_key, job_id, commands, node, description)
+            controller.create_cron(cron_exp, cron_key, job_id, commands, node, description, artifacts)
         response = Response(
-            response=controller.create_build(job_id, commands, node, description),
+            response=controller.create_build(job_id, commands, node, description, artifacts),
             status=200,
             mimetype='application/json'
         )

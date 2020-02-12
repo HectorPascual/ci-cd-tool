@@ -11,14 +11,15 @@ scheduler = BackgroundScheduler() # Scheduler for cron builds
 logger = logging.getLogger('root')
 
 
-def create_cron(cron_exp, cron_key, job_id, commands, node, description):
+def create_cron(cron_exp, cron_key, job_id, commands, node, description, artifacts):
 
     minute, hour, day_month, month, day_week = cron_exp.split(' ')
     kwargs = {
         'job_id' : job_id,
         'commands' : commands,
         'node_id' : node,
-        'description': description
+        'description': description,
+        'artifacts': artifacts
     }
     cron_build = CronBuild(cron_exp=cron_exp, cron_key=cron_key, job_id=job_id, commands=commands
                            , node_id=node, build_description=description)
