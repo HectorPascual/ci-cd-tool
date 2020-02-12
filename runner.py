@@ -24,12 +24,9 @@ class RunnerSSH():
         for cmd in cmd_list:
             logging.info(f"Executing shell command : {cmd}")
             _ , stdout , stderr = self.ssh_client.exec_command(f"cd {self.node.workspace};{cmd}")
-            output += stdout.read().decode("utf-8") + '\n'
-            err = stderr.read().decode("utf-8")
-            if err != '':
+            output += stdout.read().decode("utf-8") +  stderr.read().decode("utf-8") + '\n'
+            if stderr.channel.recv_exit_status() != 0:
                 status = "failed"
-                output += f"Last command executed with error code : {stderr.channel.recv_exit_status()}\n{err}"
-                logging.error(err)
         return output, status
 
 
