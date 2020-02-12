@@ -1,5 +1,5 @@
 import datetime
-from app import db
+from src.app import db
 
 class CronBuild(db.Model):
     cron_key = db.Column(db.String(32), primary_key=True)

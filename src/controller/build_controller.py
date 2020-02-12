@@ -1,9 +1,8 @@
 from os.path import abspath, dirname
 import json
-import logging
-from schemas import *
-from app import db
-from runner import *
+from src.schemas import *
+from src.app import db
+from src.runner import *
 import yaml
 logger = logging.getLogger('root')
 
@@ -52,9 +51,8 @@ def create_build(job_id, commands, node_id, description, artifacts):
     # Manage archive required artifacts
     if artifacts :
         runners[int(node_id)].get_files(artifacts,
-                                        f"{dirname(dirname(abspath(__file__)))}/artifacts/" +
-                                        f"job_{job_id}/build_{id}/",
-                                        node.workspace)
+                                        f"{dirname(dirname(dirname(abspath(__file__))))}/artifacts/"
+                                        + f"job_{job_id}/build_{id}/", node.workspace)
 
     db.session.add(Build(id = id, job_id=job_id, commands=commands, output = output,
                          node_id = node_id, description = description, status=status))

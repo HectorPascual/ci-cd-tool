@@ -1,9 +1,9 @@
-from .build_controller import create_build
+from src.controller.build_controller import create_build
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import JobLookupError
 import logging
-from app import db
-from schemas import CronBuild
+from src.app import db
+from src.schemas import CronBuild
 import json
 from sqlalchemy.exc import InvalidRequestError
 

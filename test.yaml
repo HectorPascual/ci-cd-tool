@@ -1,7 +1,7 @@
 - stage:
     name: Checkout
     commands :
-        - git clone https://github.com/HectorPascual/ci-cd-tool.git
+        - git clone https://github.com/HectorPascual/ci_cd_tool.git
         - echo 'hello'
 
 

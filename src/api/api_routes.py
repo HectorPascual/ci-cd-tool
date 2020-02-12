@@ -7,7 +7,7 @@ api_blueprint = Blueprint('api', __name__)
 
 @api_blueprint.route('/jobs', methods=('GET', 'POST'))
 def jobs():
-    import controller
+    from src import controller
 
     if request.method == 'GET':
         response = Response(
@@ -28,7 +28,7 @@ def jobs():
 
 @api_blueprint.route('/jobs/<int:job_id>', methods=('GET', 'DELETE'))
 def job(job_id):
-    import controller
+    from src import controller
     if request.method == 'GET':
         response = Response(
             response=controller.get_jobs(job_id),
@@ -47,7 +47,7 @@ def job(job_id):
 
 @api_blueprint.route('/jobs/<int:job_id>/builds', methods=('GET', 'POST'))
 def builds(job_id):
-    import controller
+    from src import controller
 
     if request.method == 'GET':
         response = Response(
@@ -64,10 +64,10 @@ def builds(job_id):
         cron_key = request.form.get('cron_key')
 
         # YAML File handling
+        artifacts = None
         if request.files:
             commands_file = request.files['commands_file']
             commands, artifacts = controller.parse_yaml(commands_file)
-
         if cron_exp:
             controller.create_cron(cron_exp, cron_key, job_id, commands, node, description, artifacts)
         response = Response(
@@ -79,7 +79,7 @@ def builds(job_id):
 
 @api_blueprint.route('/jobs/<int:job_id>/builds/<int:build_id>', methods=('GET', 'DELETE')) # Build id is generic not belonging to job id
 def build(job_id, build_id):
-    import controller
+    from src import controller
     if request.method == 'GET':
         response = Response(
             response=controller.get_builds(job_id, build_id),
@@ -97,7 +97,7 @@ def build(job_id, build_id):
 
 @api_blueprint.route('/nodes', methods=('GET', 'POST'))
 def nodes():
-    import controller
+    from src import controller
 
     if request.method == 'GET':
         response = Response(
@@ -121,7 +121,7 @@ def nodes():
 
 @api_blueprint.route('/nodes/<int:node_id>', methods=('GET', 'DELETE')) # Build id is generic not belonging to job id
 def node(node_id):
-    import controller
+    from src import controller
     if request.method == 'GET':
         response = Response(
             response=controller.get_nodes(node_id),
@@ -139,7 +139,7 @@ def node(node_id):
 
 @api_blueprint.route('/cron_builds')
 def cron_builds():
-    import controller
+    from src import controller
     if request.method == 'GET':
         response = Response(
             response=controller.get_cron_builds(),
@@ -150,7 +150,7 @@ def cron_builds():
 
 @api_blueprint.route('/cron_build/<cron_key>', methods=('GET', 'DELETE'))
 def cron_build(cron_key):
-    import controller
+    from src import controller
     if request.method == 'GET':
         response = Response(
             response=controller.get_cron_builds(cron_key),

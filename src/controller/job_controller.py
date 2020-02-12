@@ -1,7 +1,7 @@
 import json
 import logging
-from schemas import Job
-from app import db
+from src.schemas import Job
+from src.app import db
 
 logger = logging.getLogger('root')
 
