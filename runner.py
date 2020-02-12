@@ -40,15 +40,34 @@ class RunnerSSH():
 
         # If wildcard, multiple files will be searched else only the file that matches the path for
         # each artifact
+        found_artifacts = 0
         for artifact in artifacts:
-            files = [artifact]
+            files = []
             if '*' in artifact:
                 p = Path(artifact)
-                _, stdout, _ = self.ssh_client.exec_command(f"find {workspace}/{p.parents[0]} -name '{p.name}'")
-                files = stdout.read().decode("utf-8").splitlines()
+                _, stdout, stderr = self.ssh_client.exec_command(f"find {workspace}/{p.parents[0]} -name '{p.name}'")
+                if stderr.channel.recv_exit_status() != 0 :
+                    logger.error(f"Failed collecting artifact in path ({artifact})")
+                else :
+                    files = stdout.read().decode("utf-8").splitlines()
+            else:
+                if Path(artifact).exists():
+                    files = [artifact]
+                else:
+                    logger.error(f"Failed collecting artifact in path ({artifact})")
             for file in files:
                 f = Path(file)
-                self.ftp_client.get(file, local_path + f.name)
+                try:
+                    self.ftp_client.get(file, local_path + f.name)
+                except FileNotFoundError as e:
+                    logger.error(f"Failed collecting artifact in path ({file}) with error : {e}")
+                    Path(local_path + f.name).unlink()
+            found_artifacts += len(files)
+
+        logger.info(f"Collected {found_artifacts} artifacts.")
+        if found_artifacts == 0 :
+            Path(local_path).rmdir()
+        return found_artifacts
 
 class RunerLOCALHOST():
     def __init__(self, node):

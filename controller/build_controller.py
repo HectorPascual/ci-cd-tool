@@ -52,7 +52,8 @@ def create_build(job_id, commands, node_id, description, artifacts):
     # Manage archive required artifacts
     if artifacts :
         runners[int(node_id)].get_files(artifacts,
-                                        f"{dirname(dirname(abspath(__file__)))}/job_{job_id}/build_{id}/",
+                                        f"{dirname(dirname(abspath(__file__)))}/artifacts/" +
+                                        f"job_{job_id}/build_{id}/",
                                         node.workspace)
 
     db.session.add(Build(id = id, job_id=job_id, commands=commands, output = output,

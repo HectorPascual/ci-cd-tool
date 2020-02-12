@@ -13,5 +13,5 @@
         - time
         - echo bye
 
-- archive: ci-cd-tool/test.yaml
+- archive: 'ci-cd-tool/*.py'
 - archive: '*.key'
