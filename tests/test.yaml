@@ -1,0 +1,17 @@
+- stage:
+    name: Checkout
+    commands :
+        - git clone https://github.com/HectorPascual/ci_cd_tool.git
+        - echo 'hello'
+
+
+- stage:
+    name: Build
+    commands:
+        - pwd
+        - ls
+        - time
+        - echo bye
+
+- archive: 'ci-cd-tool/*.py'
+- archive: '*.key'
