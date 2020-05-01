@@ -12,7 +12,8 @@ class CronBuild(db.Model):
 
     def to_dict(self):
         return {
-            'cron_key' : self.cron_key,
+            'cron_key': self.cron_key,
+            'cron_exp': self.cron_exp,
             'build_description': self.build_description,
             'commands': self.commands,
             'job_id': self.job_id,

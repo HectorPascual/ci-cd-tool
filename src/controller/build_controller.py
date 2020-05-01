@@ -25,7 +25,7 @@ def get_builds(job_id, build_id=None):
         logger.info(f"[DB Access] There was a problem trying to get builds\n{e}")
         return json.dumps([])
 
-def create_build(job_id, commands, node_id, description, artifacts):
+def create_build(job_id, commands, node_id, description, artifacts=''):
     job = Job.query.get(job_id)
     node = Node.query.get(node_id)
 

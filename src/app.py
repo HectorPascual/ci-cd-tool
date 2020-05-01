@@ -13,12 +13,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
 app.register_blueprint(api_blueprint)
 db = SQLAlchemy(app)
 
-if __name__ == '__main__':
+@app.before_first_request
+def init_cron():
     # Must start the cron jobs stored in the database
     from src.controller import start_cron
     from src.schemas import CronBuild
     cron_list = CronBuild.query.all()
     start_cron(cron_list)
 
-    # Start the Flask App
-    app.run(debug=False)
